@@ -1,0 +1,15 @@
+{
+    "name": "node-NetworkIP"
+  , "version": "0.0.1"
+  , "description": "Simple module to get IP of the platform"
+  , "keywords": ["Network", "IP"]
+  , "repository" :
+	  { "type" : "git"
+	    , "url" : "http://github.com/reregistered/node-NetworkIP.git"
+	  }
+  , "author": "Dov Amihod "
+  , "dependencies": {
+  }
+  , "main": "index"
+  , "engines": { "node": ">= 0.4.0 < 0.7.0" }
+}
