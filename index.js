@@ -51,4 +51,4 @@ var getNetworkIPs = (function () {
     };
 })();
 
-exports.IPs = getNetworkIPs;
+exports.getNetworkIPs = getNetworkIPs;
