@@ -1,6 +1,6 @@
 {
-    "name": "node-NetworkIP"
-  , "version": "0.0.1"
+    "name": "node-networkip"
+  , "version": "0.0.2"
   , "description": "Simple module to get IP of the platform"
   , "keywords": ["Network", "IP"]
   , "repository" :
@@ -11,5 +11,5 @@
   , "dependencies": {
   }
   , "main": "index"
-  , "engines": { "node": ">= 0.4.0 < 0.7.0" }
+  , "engines": { "node": ">= 0.4.0 < 0.9.0" }
 }
