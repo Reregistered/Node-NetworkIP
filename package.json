@@ -8,8 +8,9 @@
 	    , "url" : "http://github.com/reregistered/node-NetworkIP.git"
 	  }
   , "author": "Dov Amihod "
-  , "dependencies": {
-  }
   , "main": "index"
-  , "engines": { "node": ">= 0.4.0 < 0.9.0" }
+  , "scripts": {
+      "test": "node test/test"
+  }
+  , "engines": { "node": ">= 0.4.0 < 0.11.0" }
 }
