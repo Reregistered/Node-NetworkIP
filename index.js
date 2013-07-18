@@ -16,6 +16,7 @@ var getNetworkIPs = (function () {
             filterRE = /\bIP-[^:\r\n]+:\s*([^\s]+)/g;
             // TODO: find IPv6 RegEx
             break;
+        case 'freebsd':
         case 'darwin':
             command = 'ifconfig';
             filterRE = /\binet\s+([^\s]+)/g;
