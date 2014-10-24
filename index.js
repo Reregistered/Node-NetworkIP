@@ -67,5 +67,9 @@ var getNetworkIP = function (in_params) {
 
 };
 
+exports.getNetworkIP = getNetworkIP;
 // We export getNetworkIPs for historical reasons.
-exports.getNetworkIPs = getNetworkIP;
+exports.getNetworkIPs = function (in_callback) {
+  var ip = getNetworkIP();
+  return in_callback(null, [ip]);
+};
