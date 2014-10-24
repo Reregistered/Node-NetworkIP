@@ -1,55 +1,71 @@
 /*
+ * @fileoverview Wrapper for Node OS module to grab the address of a
+ * network interface. It will guess which one is the right one.
  */
 
-var getNetworkIPs = (function () {
-    var ignoreRE = /^(127\.0\.0\.1|::1|fe80(:1)?::1(%.*)?)$/i;
+var os = require('os');
 
-    var exec = require('child_process').exec;
-    var cached;
-    var command;
-    var filterRE;
+var BLACKLIST = [
+  'fe80::1',
+  '127.0.0.1',
+  '::1'
+];
 
-    switch (process.platform) {
-        case 'win32':
-            //case 'win64': // TODO: test
-            command = 'ipconfig';
-            filterRE = /\bIP-[^:\r\n]+:\s*([^\s]+)/g;
-            // TODO: find IPv6 RegEx
-            break;
-        case 'freebsd':
-        case 'darwin':
-            command = 'ifconfig';
-            filterRE = /\binet\s+([^\s]+)/g;
-            // filterRE = /\binet6\s+([^\s]+)/g; // IPv6
-            break;
-        default:
-            command = 'ifconfig';
-            filterRE = /\binet\b[^:]+:\s*([^\s]+)/g;
-            // filterRE = /\binet6[^:]+:\s*([^\s]+)/g; // IPv6
-            break;
-    }
+/**
+ * @param {bool=true} in_params.ignoreInternal - ignore internal interfaces.
+ * @param {family='IPv4'} in_params.family - address family to select. You
+ *   can give 'IPv4' or 'IPv6'.
+ *
+ * @returns {string} what we believe to be the IP address you want.
+ */
+var getNetworkIP = function (in_params) {
 
-    return function (callback, bypassCache) {
-        if (cached && !bypassCache) {
-            callback(null, cached);
-            return;
+  in_params = in_params || {};
+
+  var ignoreInternal = (in_params.ignoreInternal === undefined)
+    ? true
+    : in_params.ignoreInternal;
+
+  var family = (in_params.family === undefined)
+    ? 'IPv4'
+    : in_params.family;
+
+  var interfaces = os.networkInterfaces();
+  var candidates = {};
+
+  for (var i in interfaces) {
+    candidates[i] = [];
+    var hasFamily;
+    for (var j in interfaces[i]) {
+      if (!interfaces[i][j].internal || !ignoreInternal) {
+        if (BLACKLIST.indexOf(interfaces[i][j].address) === -1) {
+          candidates[i].push(interfaces[i][j]);
         }
-        // system call
-        exec(command, function (error, stdout, sterr) {
-            cached = [];
-            var ip;
-            var matches = stdout.match(filterRE) || [];
-            //if (!error) {
-            for (var i = 0; i < matches.length; i++) {
-                ip = matches[i].replace(filterRE, '$1')
-                if (!ignoreRE.test(ip)) {
-                    cached.push(ip);
-                }
-            }
-            //}
-            callback(error, cached);
-        });
-    };
-})();
+      }
+      if (interfaces[i][j].family === family) {
+        hasFamily = true;
+      }
+    }
+    // Filter out entries that don't have a family matching the desired family.
+    if (!hasFamily) {
+      delete candidates[i];
+    }
+  }
 
-exports.getNetworkIPs = getNetworkIPs;
+  var longest = [];
+  for (var i in candidates) {
+    if (candidates[i].length > longest.length) {
+      longest = candidates[i];
+    }
+  }
+
+  for (var i in longest) {
+    if (longest[i].family === family) {
+      return longest[i].address;
+    }
+  }
+
+};
+
+// We export getNetworkIPs for historical reasons.
+exports.getNetworkIPs = getNetworkIP;
